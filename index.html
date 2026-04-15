@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faculty Training Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --white:   #ffffff;
+  --gray-50: #f9f9f9;
+  --gray-100:#f2f2f0;
+  --gray-200:#e5e5e2;
+  --gray-300:#d1d1cc;
+  --gray-400:#a8a8a2;
+  --gray-500:#6e6e68;
+  --gray-700:#3a3a36;
+  --gray-900:#1a1a18;
+  --blue:    #1a4a8a;
+  --blue-bg: #eef3fb;
+  --blue-border: #c2d4ef;
+  --red-bg:  #fdf0ee;
+  --red-border: #f0c4bc;
+  --red-text:#a03018;
+  --green-bg:#edf5ed;
+  --green-border:#bddabd;
+  --green-text:#2a6c2a;
+  --amber-bg:#fef8ec;
+  --amber-border:#eed9a0;
+  --amber-text:#7a5c10;
+  --sidebar-w: 248px;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-900);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--white);
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.brand-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--gray-900);
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 3px;
+  letter-spacing: 0.01em;
+}
+
+.nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-group { margin-bottom: 20px; }
+
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  padding: 0 10px;
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--gray-500);
+  transition: background 0.12s, color 0.12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-item:hover { background: var(--gray-100); color: var(--gray-900); }
+.nav-item.on    { background: var(--blue-bg); color: var(--blue); font-weight: 500; }
+
+.nav-item svg { flex-shrink: 0; opacity: 0.6; }
+.nav-item.on svg { opacity: 1; }
+
+.nav-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--gray-400);
+  background: var(--gray-100);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+.nav-item.on .nav-count { background: rgba(26,74,138,0.1); color: var(--blue); }
+
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-name  { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+.user-role  { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+
+/* ── Main ── */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; }
+
+/* ── Topbar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 9;
+  background: rgba(249,249,249,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 32px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--gray-900);
+  flex: 1;
+}
+
+.search {
+  position: relative;
+}
+
+.search svg {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+}
+
+.search input {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 7px;
+  padding: 7px 12px 7px 32px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--gray-900);
+  outline: none;
+  width: 210px;
+  transition: border-color 0.15s, width 0.2s;
+}
+
+.search input::placeholder { color: var(--gray-400); }
+.search input:focus { border-color: var(--blue); width: 250px; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { opacity: 0.88; }
+
+/* ── Content ── */
+.content { padding: 28px 32px 60px; }
+
+/* ── Stats ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color 0.15s;
+}
+.stat:hover { border-color: var(--gray-300); }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.stat-num {
+  font-family: 'Source Serif 4', serif;
+  font-size: 34px;
+  font-weight: 300;
+  color: var(--gray-900);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.stat-desc { font-size: 12px; color: var(--gray-400); margin-top: 5px; }
+
+/* ── Section header ── */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-label {
+  font-family: 'Source Serif 4', serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--gray-900);
+  letter-spacing: -0.2px;
+}
+
+.filters {
+  display: flex;
+  gap: 4px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.filter-btn {
+  padding: 5px 13px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--gray-500);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.12s;
+}
+.filter-btn:hover { background: var(--gray-100); color: var(--gray-900); }
+.filter-btn.on    { background: var(--gray-900); color: white; }
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  animation: up 0.35s ease both;
+}
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.card:nth-child(1) { animation-delay: 0.03s; }
+.card:nth-child(2) { animation-delay: 0.07s; }
+.card:nth-child(3) { animation-delay: 0.11s; }
+.card:nth-child(4) { animation-delay: 0.15s; }
+.card:nth-child(5) { animation-delay: 0.19s; }
+.card:nth-child(6) { animation-delay: 0.23s; }
+
+.card:hover {
+  border-color: var(--gray-300);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  transform: translateY(-2px);
+}
+
+/* Thumbnail */
+.thumb {
+  height: 156px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.thumb.vid { background: #111827; }
+.thumb.doc { background: #1a2a1a; }
+
+.play-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+  background: rgba(255,255,255,0.06);
+}
+
+.card:hover .play-btn {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.play-icon {
+  width: 0; height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid rgba(255,255,255,0.7);
+  margin-left: 3px;
+  transition: border-left-color 0.18s;
+}
+.card:hover .play-icon { border-left-color: white; }
+
+.doc-icon {
+  display: flex; flex-direction: column; gap: 5px; align-items: center;
+  transition: all 0.18s;
+}
+
+.doc-lines {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 28px;
+}
+
+.doc-line {
+  height: 2px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 1px;
+}
+.doc-line:first-child { width: 100%; }
+.doc-line:nth-child(2) { width: 80%; }
+.doc-line:last-child { width: 90%; }
+
+.card:hover .doc-line { background: rgba(255,255,255,0.45); }
+
+.thumb-meta {
+  position: absolute;
+  bottom: 10px; left: 12px; right: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.thumb-type {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.thumb-dur {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Card body */
+.card-body { padding: 14px 16px 13px; }
+
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
+
+.tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.tag.ai       { background: var(--blue-bg);  color: var(--blue);       border: 1px solid var(--blue-border); }
+.tag.prompts  { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); }
+.tag.computer { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+.tag.tools    { background: var(--gray-100); color: var(--gray-700);   border: 1px solid var(--gray-200); }
+.tag.workflow { background: var(--gray-100); color: var(--gray-700);   border: 1px solid var(--gray-200); }
+
+.card-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: var(--gray-900);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.card-desc {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  line-height: 1.55;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 11px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.card-date { font-size: 11px; color: var(--gray-400); }
+
+.card-btns { display: flex; gap: 4px; }
+
+.icon-btn {
+  width: 26px; height: 26px;
+  border: 1px solid var(--gray-200);
+  background: none;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--gray-400);
+  transition: all 0.12s;
+}
+.icon-btn:hover { background: var(--gray-100); color: var(--gray-700); border-color: var(--gray-300); }
+.icon-btn.del:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
+
+/* ── Empty ── */
+.empty {
+  grid-column: 1 / -1;
+  padding: 64px 32px;
+  text-align: center;
+  color: var(--gray-400);
+}
+
+.empty-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+}
+.empty-sub { font-size: 13px; }
+
+/* ── Modal overlay ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── Modal ── */
+.modal {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  width: 520px;
+  max-width: 95vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.2s ease;
+}
+.overlay.open .modal { transform: none; }
+
+.modal-head {
+  padding: 24px 26px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+
+.modal-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--gray-900);
+}
+
+.modal-sub { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+
+.modal-close {
+  width: 30px; height: 30px;
+  border: 1px solid var(--gray-200);
+  background: none;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--gray-400);
+  font-size: 16px;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--gray-100); color: var(--gray-700); }
+
+.modal-body { padding: 22px 26px; }
+
+/* Form */
+.field { margin-bottom: 18px; }
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 7px;
+}
+
+.inp, .txa, .sel {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-family: 'Inter', sans-serif;
+  color: var(--gray-900);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.inp::placeholder, .txa::placeholder { color: var(--gray-400); }
+.inp:focus, .txa:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,74,138,0.08); }
+.txa { resize: vertical; min-height: 78px; line-height: 1.5; }
+
+/* Type selector */
+.type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.type-opt {
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 13px 14px;
+  cursor: pointer;
+  transition: all 0.14s;
+  background: var(--white);
+  text-align: left;
+}
+.type-opt:hover { border-color: var(--gray-300); background: var(--gray-50); }
+.type-opt.on   { border-color: var(--blue); background: var(--blue-bg); }
+
+.type-opt-title { font-size: 13px; font-weight: 500; color: var(--gray-900); margin-bottom: 1px; }
+.type-opt-hint  { font-size: 11.5px; color: var(--gray-400); }
+.type-opt.on .type-opt-hint { color: var(--blue); opacity: 0.7; }
+
+/* Dropzone */
+.drop {
+  border: 1.5px dashed var(--gray-300);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--gray-50);
+}
+.drop:hover, .drop.over { border-color: var(--blue); background: var(--blue-bg); }
+.drop input { display: none; }
+.drop-title { font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 3px; }
+.drop-hint  { font-size: 12px; color: var(--gray-400); }
+
+.file-row {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-border);
+  border-radius: 7px;
+  padding: 9px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.file-name { flex: 1; color: var(--blue); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-rm   { cursor: pointer; color: var(--gray-400); font-size: 15px; transition: color 0.12s; }
+.file-rm:hover { color: var(--red-text); }
+
+/* Topic toggles */
+.topic-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.topic-btn {
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--gray-200);
+  background: none;
+  color: var(--gray-500);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.topic-btn:hover { border-color: var(--gray-300); color: var(--gray-900); }
+.topic-btn.on    { background: var(--gray-900); color: white; border-color: var(--gray-900); }
+
+.modal-foot {
+  padding: 14px 26px 22px;
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+.btn-cancel {
+  padding: 8px 18px;
+  border: 1px solid var(--gray-200);
+  background: none;
+  border-radius: 7px;
+  font-size: 13px; font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-cancel:hover { border-color: var(--gray-300); color: var(--gray-900); }
+
+.btn-save {
+  padding: 8px 20px;
+  background: var(--blue);
+  border: none;
+  border-radius: 7px;
+  font-size: 13px; font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+.btn-save:hover { opacity: 0.88; }
+
+/* ── Viewer ── */
+.viewer-ov {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.viewer-ov.open { opacity: 1; pointer-events: all; }
+
+.viewer-bar {
+  width: min(90vw, 880px);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.viewer-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 16px; font-weight: 400;
+  color: rgba(255,255,255,0.9);
+}
+
+.viewer-close {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(255,255,255,0.6); font-size: 15px;
+  transition: all 0.12s;
+}
+.viewer-close:hover { background: rgba(255,255,255,0.12); color: white; }
+
+.viewer-frame {
+  width: min(90vw, 880px);
+  height: 70vh;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.viewer-frame iframe, .viewer-frame video { width: 100%; height: 100%; border: none; }
+
+.viewer-ph { text-align: center; padding: 40px; }
+.viewer-ph-icon { font-size: 42px; margin-bottom: 16px; opacity: 0.25; }
+.viewer-ph-title { font-family: 'Source Serif 4', serif; font-size: 17px; font-weight: 300; color: var(--gray-700); margin-bottom: 6px; }
+.viewer-ph-sub { font-size: 13px; color: var(--gray-400); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--gray-900);
+  color: white;
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 300;
+  display: flex; align-items: center; gap: 9px;
+  transform: translateY(70px); opacity: 0;
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.toast.show { transform: none; opacity: 1; }
+
+.toast-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--gray-200);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-title">Faculty Training Hub</div>
+    <div class="brand-sub">AI & Digital Skills · Instructor Edition</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Library</div>
+      <button class="nav-item on" onclick="setNav(this,'all')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+        All resources
+        <span class="nav-count" id="nc-all">6</span>
+      </button>
+      <button class="nav-item" onclick="setNav(this,'video')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5v7A1.5 1.5 0 0 1 12.5 13h-9A1.5 1.5 0 0 1 2 11.5v-7Z" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 6l3 2-3 2V6Z" fill="currentColor"/></svg>
+        Videos
+        <span class="nav-count" id="nc-vid">3</span>
+      </button>
+      <button class="nav-item" onclick="setNav(this,'pdf')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h5L13 4.5V13.5A1.5 1.5 0 0 1 11.5 15h-7A1.5 1.5 0 0 1 3 13.5v-11Z" stroke="currentColor" stroke-width="1.2"/><path d="M9 1v3.5H13" stroke="currentColor" stroke-width="1.2"/><line x1="5.5" y1="8" x2="10.5" y2="8" stroke="currentColor" stroke-width="1.2"/><line x1="5.5" y1="10.5" x2="10.5" y2="10.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Documents
+        <span class="nav-count" id="nc-doc">3</span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Topics</div>
+      <button class="nav-item" onclick="setNav(this,'ai')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 8a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="10" r="1" fill="currentColor"/></svg>
+        AI Fundamentals
+      </button>
+      <button class="nav-item" onclick="setNav(this,'prompts')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Prompt Engineering
+      </button>
+      <button class="nav-item" onclick="setNav(this,'computer')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 13.5h6M8 11.5v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Computer Skills
+      </button>
+      <button class="nav-item" onclick="setNav(this,'tools')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M11.53 4.47l1.42-1.42M3.05 12.95l1.42-1.42" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Tools & Software
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar" id="sidebarAvatar">I</div>
+    <div style="flex:1;min-width:0">
+      <div class="user-name" id="sidebarName">Instructor</div>
+      <div class="user-role" id="sidebarRole">Read-only access</div>
+    </div>
+    <button id="adminToggleBtn" onclick="handleAdminToggle()" title="Admin login" style="background:none;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:500;color:var(--gray-400);font-family:'Inter',sans-serif;transition:all 0.12s;white-space:nowrap">
+      Admin
+    </button>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title" id="pageTitle">All resources</div>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" id="searchInput" placeholder="Search resources…" oninput="render()">
+    </div>
+    <button class="btn-primary" id="addBtn" onclick="openModal()" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Add resource
+    </button>
+  </header>
+
+  <div class="content">
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Total</div>
+        <div class="stat-num" id="s-total">0</div>
+        <div class="stat-desc">resources</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Videos</div>
+        <div class="stat-num" id="s-vid">0</div>
+        <div class="stat-desc">lessons</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Documents</div>
+        <div class="stat-num" id="s-doc">0</div>
+        <div class="stat-desc">guides & PDFs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Topics</div>
+        <div class="stat-num">4</div>
+        <div class="stat-desc">areas covered</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-label" id="sectionLabel">All training resources</div>
+      <div class="filters">
+        <button class="filter-btn on" onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn" onclick="setFilter(this,'video')">Videos</button>
+        <button class="filter-btn" onclick="setFilter(this,'pdf')">Documents</button>
+        <button class="filter-btn" onclick="setFilter(this,'ai')">AI</button>
+        <button class="filter-btn" onclick="setFilter(this,'prompts')">Prompts</button>
+        <button class="filter-btn" onclick="setFilter(this,'computer')">Computer</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="ovClick(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle">Add resource</div>
+        <div class="modal-sub">Upload a video or document to your training library</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">Type</label>
+        <div class="type-row">
+          <div class="type-opt on" id="optVid" onclick="pickType(this,'video')">
+            <div class="type-opt-title">Video lesson</div>
+            <div class="type-opt-hint">YouTube link or MP4</div>
+          </div>
+          <div class="type-opt" id="optDoc" onclick="pickType(this,'pdf')">
+            <div class="type-opt-title">Document</div>
+            <div class="type-opt-hint">PDF, slides, guide</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Title</label>
+        <input class="inp" type="text" id="fTitle" placeholder="e.g. Introduction to Generative AI">
+      </div>
+
+      <div class="field">
+        <label class="label">Description</label>
+        <textarea class="txa" id="fDesc" placeholder="What does this resource cover? Who is it for?"></textarea>
+      </div>
+
+      <div class="field" id="wUrl">
+        <label class="label">YouTube URL</label>
+        <input class="inp" type="text" id="fUrl" placeholder="https://youtube.com/watch?v=…">
+      </div>
+
+      <div class="field" id="wDur">
+        <label class="label">Duration</label>
+        <input class="inp" type="text" id="fDur" placeholder="e.g. 18:45">
+      </div>
+
+      <div class="field" id="wFile" style="display:none">
+        <label class="label">File</label>
+        <div class="drop" id="drop"
+             onclick="document.getElementById('fFile').click()"
+             ondragover="event.preventDefault();this.classList.add('over')"
+             ondragleave="this.classList.remove('over')"
+             ondrop="onDrop(event)">
+          <div class="drop-title">Drop file here or click to browse</div>
+          <div class="drop-hint">PDF, PPTX, DOCX accepted</div>
+          <input type="file" id="fFile" accept=".pdf,.pptx,.docx" onchange="onFile(this)">
+        </div>
+        <div id="filePill" style="display:none"></div>
+      </div>
+
+      <div class="field">
+        <label class="label">Topics</label>
+        <div class="topic-row">
+          <button class="topic-btn on" onclick="togTopic(this,'ai')">AI Fundamentals</button>
+          <button class="topic-btn" onclick="togTopic(this,'prompts')">Prompt Engineering</button>
+          <button class="topic-btn" onclick="togTopic(this,'computer')">Computer Skills</button>
+          <button class="topic-btn" onclick="togTopic(this,'tools')">Tools</button>
+          <button class="topic-btn" onclick="togTopic(this,'workflow')">Workflow</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="btnSave" onclick="save()">Save resource</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div class="viewer-ov" id="viewerOv" onclick="vOvClick(event)">
+  <div class="viewer-bar">
+    <div class="viewer-title" id="viewerTitle"></div>
+    <button class="viewer-close" onclick="closeViewer()">✕</button>
+  </div>
+  <div class="viewer-frame" id="viewerFrame"></div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="overlay" id="adminOverlay" onclick="adminOvClick(event)">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Admin access</div>
+        <div class="modal-sub">Enter your password to manage content</div>
+      </div>
+      <button class="modal-close" onclick="closeAdminModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding-bottom:8px">
+      <div class="field">
+        <label class="label">Password</label>
+        <input class="inp" type="password" id="adminPwInput" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') checkAdmin()">
+        <div id="adminErr" style="display:none;margin-top:7px;font-size:12px;color:var(--red-text)">
+          Incorrect password. Please try again.
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
+      <button class="btn-save" onclick="checkAdmin()">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toastMsg">Saved</span>
+</div>
+
+<script>
+// ── Config ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwHJiCRnKgGj8UpLhfDNt_ubV-rgw58IoNkrTEAu0o_Gi0ebX_JwMqJbF1Gfj9Ts3Hc/exec';
+const TAG_LABELS = { ai:'AI', prompts:'Prompts', computer:'Computer', tools:'Tools', workflow:'Workflow' };
+const ADMIN_PASS = '2846';
+
+// ── Admin state ──
+let isAdmin = false;
+
+function handleAdminToggle() {
+  if (isAdmin) {
+    // Log out
+    isAdmin = false;
+    sessionStorage.removeItem('fth_admin');
+    applyAdminUI();
+    toast('Signed out of admin.');
+  } else {
+    openAdminModal();
+  }
+}
+
+function openAdminModal() {
+  document.getElementById('adminPwInput').value = '';
+  document.getElementById('adminErr').style.display = 'none';
+  document.getElementById('adminOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('adminPwInput').focus(), 80);
+}
+
+function closeAdminModal() {
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+
+function adminOvClick(e) {
+  if (e.target.id === 'adminOverlay') closeAdminModal();
+}
+
+function checkAdmin() {
+  const val = document.getElementById('adminPwInput').value;
+  if (val === ADMIN_PASS) {
+    isAdmin = true;
+    sessionStorage.setItem('fth_admin', '1');
+    closeAdminModal();
+    applyAdminUI();
+    toast('Admin access granted. Welcome!');
+  } else {
+    document.getElementById('adminErr').style.display = 'block';
+    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwInput').focus();
+  }
+}
+
+function applyAdminUI() {
+  // Add resource button
+  document.getElementById('addBtn').style.display = isAdmin ? '' : 'none';
+  // Edit/delete buttons in cards — re-render to show/hide them
+  render();
+  // Sidebar identity
+  document.getElementById('sidebarAvatar').textContent = isAdmin ? 'A' : 'I';
+  document.getElementById('sidebarAvatar').style.background = isAdmin ? 'var(--blue)' : 'var(--gray-400)';
+  document.getElementById('sidebarName').textContent = isAdmin ? 'Admin' : 'Instructor';
+  document.getElementById('sidebarRole').textContent = isAdmin ? 'Admin · Full access' : 'Read-only access';
+  const btn = document.getElementById('adminToggleBtn');
+  btn.textContent = isAdmin ? 'Sign out' : 'Admin';
+  btn.style.color = isAdmin ? 'var(--red-text)' : 'var(--gray-400)';
+  btn.style.borderColor = isAdmin ? 'var(--red-border)' : 'var(--gray-200)';
+}
+
+let items = [];
+let navF = 'all', chipF = 'all';
+let selType = 'video', selTopics = new Set(['ai']);
+let editId = null, selFile = null;
+let loading = false;
+
+// ── Google Sheets helpers ──
+function gasGet(cb) {
+  const script = document.createElement('script');
+  const cbName = '_cb_' + Date.now();
+  window[cbName] = data => { delete window[cbName]; script.remove(); cb(data); };
+  script.src = `${GAS_URL}?callback=${cbName}`;
+  document.body.appendChild(script);
+}
+
+function gasPost(params) {
+  const body = new URLSearchParams(params).toString();
+  return fetch(GAS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
+}
+
+function genId() {
+  return 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+}
+
+// ── Load from sheet ──
+function loadFromSheet() {
+  setLoading(true);
+  gasGet(res => {
+    if (res && res.data) {
+      items = res.data.map(row => ({
+        id:    row.id,
+        type:  row.type,
+        title: row.title,
+        desc:  row.desc,
+        tags:  row.tags ? row.tags.split(',').map(t=>t.trim()).filter(Boolean) : [],
+        url:   row.url   || '',
+        dur:   row.dur   || '',
+        date:  row.date  || '',
+        file:  row.file  || ''
+      }));
+    }
+    setLoading(false);
+    render();
+  });
+}
+
+function setLoading(on) {
+  loading = on;
+  const g = document.getElementById('grid');
+  if (on) {
+    g.innerHTML = `<div class="empty">
+      <div class="empty-title" style="display:flex;align-items:center;gap:10px;justify-content:center">
+        <span class="spinner"></span> Loading resources…
+      </div>
+    </div>`;
+  }
+}
+
+// ── Nav / filter ──
+function setNav(btn, f) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  navF = f;
+  const map = { all:'All resources', video:'Videos', pdf:'Documents', ai:'AI Fundamentals', prompts:'Prompt Engineering', computer:'Computer Skills', tools:'Tools & Software' };
+  document.getElementById('pageTitle').textContent = map[f] || 'Resources';
+  render();
+}
+
+function setFilter(btn, f) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  chipF = f;
+  render();
+}
+
+// ── Render grid ──
+function render() {
+  if (loading) return;
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const vis = items.filter(it => {
+    if (navF === 'video' && it.type !== 'video') return false;
+    if (navF === 'pdf'   && it.type !== 'pdf')   return false;
+    if (['ai','prompts','computer','tools'].includes(navF) && !it.tags.includes(navF)) return false;
+    if (chipF === 'video' && it.type !== 'video') return false;
+    if (chipF === 'pdf'   && it.type !== 'pdf')   return false;
+    if (['ai','prompts','computer'].includes(chipF) && !it.tags.includes(chipF)) return false;
+    if (q && !it.title.toLowerCase().includes(q) && !it.desc.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const vids = items.filter(i => i.type==='video').length;
+  const docs = items.filter(i => i.type==='pdf').length;
+  document.getElementById('s-total').textContent = items.length;
+  document.getElementById('s-vid').textContent   = vids;
+  document.getElementById('s-doc').textContent   = docs;
+  document.getElementById('nc-all').textContent  = items.length;
+  document.getElementById('nc-vid').textContent  = vids;
+  document.getElementById('nc-doc').textContent  = docs;
+
+  const g = document.getElementById('grid');
+  if (!vis.length) {
+    g.innerHTML = `<div class="empty"><div class="empty-title">No resources found</div><div class="empty-sub">Add your first training resource using the button above.</div></div>`;
+    return;
+  }
+  g.innerHTML = vis.map(cardHTML).join('');
+}
+
+function cardHTML(it) {
+  const d = new Date(it.date);
+  const ds = isNaN(d) ? it.date : d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const tagHTML = it.tags.slice(0,3).map(t => `<span class="tag ${t}">${TAG_LABELS[t]||t}</span>`).join('');
+  const safeId = CSS.escape ? CSS.escape(it.id) : it.id;
+
+  const thumb = it.type === 'video'
+    ? `<div class="thumb vid">
+        <div class="play-btn"><div class="play-icon"></div></div>
+        <div class="thumb-meta">
+          <span class="thumb-type">Video</span>
+          ${it.dur ? `<span class="thumb-dur">${it.dur}</span>` : ''}
+        </div>
+       </div>`
+    : `<div class="thumb doc">
+        <div class="doc-icon"><div class="doc-lines"><div class="doc-line"></div><div class="doc-line"></div><div class="doc-line"></div></div></div>
+        <div class="thumb-meta"><span class="thumb-type">Document</span></div>
+       </div>`;
+
+  return `<div class="card" onclick="openViewer('${it.id}')">
+    ${thumb}
+    <div class="card-body">
+      <div class="card-tags">${tagHTML}</div>
+      <div class="card-title">${it.title}</div>
+      <div class="card-desc">${it.desc}</div>
+      <div class="card-foot">
+        <span class="card-date">${ds}</span>
+        <div class="card-btns" onclick="event.stopPropagation()">
+          ${isAdmin ? `
+          <button class="icon-btn" onclick="startEdit('${it.id}')" title="Edit">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 10l1.5-1.5 7-7 2 2-7 7L2 12v-2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn del" onclick="del('${it.id}')" title="Delete">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="12" y1="2" x2="2" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Modal ──
+function openModal(isEdit) {
+  if (!isEdit) {
+    editId = null; selFile = null;
+    document.getElementById('fTitle').value = '';
+    document.getElementById('fDesc').value  = '';
+    document.getElementById('fUrl').value   = '';
+    document.getElementById('fDur').value   = '';
+    document.getElementById('filePill').style.display = 'none';
+    selTopics = new Set(['ai']);
+    syncTopics();
+    pickType(document.getElementById('optVid'), 'video');
+    document.getElementById('modalTitle').textContent = 'Add resource';
+    document.getElementById('btnSave').textContent = 'Save resource';
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function ovClick(e)   { if (e.target.id==='overlay') closeModal(); }
+
+function pickType(tile, t) {
+  selType = t;
+  document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('on'));
+  tile.classList.add('on');
+  const vid = t === 'video';
+  document.getElementById('wUrl').style.display  = vid ? '' : 'none';
+  document.getElementById('wDur').style.display  = vid ? '' : 'none';
+  document.getElementById('wFile').style.display = vid ? 'none' : '';
+}
+
+function togTopic(btn, t) {
+  if (selTopics.has(t)) { selTopics.delete(t); btn.classList.remove('on'); }
+  else { selTopics.add(t); btn.classList.add('on'); }
+}
+
+function syncTopics() {
+  document.querySelectorAll('.topic-btn').forEach(b => {
+    const t = b.getAttribute('onclick').match(/'(\w+)'\)/)[1];
+    b.classList.toggle('on', selTopics.has(t));
+  });
+}
+
+function onFile(inp) { selFile = inp.files[0]; showPill(selFile.name); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop').classList.remove('over');
+  selFile = e.dataTransfer.files[0]; showPill(selFile.name);
+}
+function showPill(name) {
+  const p = document.getElementById('filePill');
+  p.style.display = 'block';
+  p.innerHTML = `<div class="file-row"><span>📎</span><span class="file-name">${name}</span><span class="file-rm" onclick="clearFile()">✕</span></div>`;
+}
+function clearFile() { selFile=null; document.getElementById('fFile').value=''; document.getElementById('filePill').style.display='none'; }
+
+// ── Save (add or edit) ──
+async function save() {
+  const title = document.getElementById('fTitle').value.trim();
+  if (!title) { document.getElementById('fTitle').style.borderColor='#e05535'; document.getElementById('fTitle').focus(); return; }
+  document.getElementById('fTitle').style.borderColor = '';
+
+  const btn = document.getElementById('btnSave');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  const url = document.getElementById('fUrl').value.trim();
+  // Auto-convert YouTube watch URLs to embed
+  const embedUrl = url.replace('watch?v=','embed/').replace('youtu.be/','www.youtube.com/embed/');
+
+  const common = {
+    type:  selType,
+    title,
+    desc:  document.getElementById('fDesc').value.trim() || '',
+    tags:  [...selTopics].join(','),
+    url:   embedUrl,
+    dur:   document.getElementById('fDur').value.trim(),
+    date:  new Date().toISOString().slice(0,10),
+    file:  selFile?.name || ''
+  };
+
+  if (editId) {
+    await gasPost({ action:'edit', id: editId, ...common });
+    // update local copy immediately
+    const idx = items.findIndex(i => i.id === editId);
+    if (idx > -1) items[idx] = { id:editId, ...common, tags:[...selTopics] };
+    editId = null;
+    toast('Resource updated.');
+  } else {
+    const id = genId();
+    await gasPost({ action:'add', id, ...common });
+    items.unshift({ id, ...common, tags:[...selTopics] });
+    toast('Resource added — visible to everyone now.');
+  }
+
+  btn.disabled = false;
+  closeModal();
+  render();
+
+  // Re-sync from sheet after a short delay to confirm write
+  setTimeout(loadFromSheet, 2000);
+}
+
+// ── Edit ──
+function startEdit(id) {
+  const it = items.find(i => i.id===id);
+  if (!it) return;
+  editId = id;
+  openModal(true);
+  setTimeout(() => {
+    document.getElementById('modalTitle').textContent = 'Edit resource';
+    document.getElementById('btnSave').textContent = 'Save changes';
+    document.getElementById('fTitle').value = it.title;
+    document.getElementById('fDesc').value  = it.desc;
+    // show original URL (convert embed back to watch for display)
+    document.getElementById('fUrl').value   = (it.url||'').replace('www.youtube.com/embed/','www.youtube.com/watch?v=');
+    document.getElementById('fDur').value   = it.dur||'';
+    selTopics = new Set(it.tags);
+    syncTopics();
+    pickType(document.getElementById(it.type==='pdf'?'optDoc':'optVid'), it.type);
+  }, 20);
+}
+
+// ── Delete ──
+async function del(id) {
+  if (!confirm('Remove this resource? This cannot be undone.')) return;
+  items = items.filter(i => i.id!==id);
+  render();
+  await gasPost({ action:'delete', id });
+  toast('Resource removed.');
+  setTimeout(loadFromSheet, 1500);
+}
+
+// ── Viewer ──
+function openViewer(id) {
+  const it = items.find(i => i.id===id);
+  if (!it) return;
+  document.getElementById('viewerTitle').textContent = it.title;
+  const f = document.getElementById('viewerFrame');
+  if (it.url && it.url.includes('youtube.com/embed')) {
+    f.innerHTML = `<iframe src="${it.url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else if (it.type==='video' && it.url) {
+    f.innerHTML = `<video src="${it.url}" controls></video>`;
+  } else {
+    const msg = it.file ? `File referenced: <strong>${it.file}</strong><br><br>Host on a server to enable inline preview.` : 'No URL or file attached yet.<br>Edit this resource to add content.';
+    f.innerHTML = `<div class="viewer-ph"><div class="viewer-ph-icon">${it.type==='pdf'?'📄':'🎬'}</div><div class="viewer-ph-title">${it.title}</div><div class="viewer-ph-sub">${msg}</div></div>`;
+  }
+  document.getElementById('viewerOv').classList.add('open');
+}
+
+function closeViewer() {
+  document.getElementById('viewerOv').classList.remove('open');
+  setTimeout(() => { document.getElementById('viewerFrame').innerHTML=''; }, 250);
+}
+function vOvClick(e) { if (e.target.id==='viewerOv') closeViewer(); }
+
+// ── Toast ──
+function toast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeViewer(); closeAdminModal(); } });
+
+// ── Boot ──
+if (sessionStorage.getItem('fth_admin') === '1') { isAdmin = true; }
+applyAdminUI();
+loadFromSheet();
+</script>
+</body>
+</html>
