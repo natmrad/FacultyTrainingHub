@@ -889,11 +889,11 @@ body {
         <div class="type-row">
           <div class="type-opt on" id="optVid" onclick="pickType(this,'video')">
             <div class="type-opt-title">Video lesson</div>
-            <div class="type-opt-hint">Upload MP4 or YouTube link</div>
+            <div class="type-opt-hint">From Drive or YouTube</div>
           </div>
           <div class="type-opt" id="optDoc" onclick="pickType(this,'pdf')">
             <div class="type-opt-title">Document</div>
-            <div class="type-opt-hint">Upload PDF, slides, guide</div>
+            <div class="type-opt-hint">PDF, slides, guide from Drive</div>
           </div>
         </div>
       </div>
@@ -908,25 +908,24 @@ body {
         <textarea class="txa" id="fDesc" placeholder="What does this resource cover? Who is it for?"></textarea>
       </div>
 
-      <!-- Video: upload or YouTube -->
+      <!-- Video section -->
       <div id="wVideoSection">
         <div class="field">
-          <label class="label">Video file</label>
-          <div class="drop" id="dropVid"
-               onclick="document.getElementById('fVidFile').click()"
-               ondragover="event.preventDefault();this.classList.add('over')"
-               ondragleave="this.classList.remove('over')"
-               ondrop="onDropVid(event)">
-            <div class="drop-title">Drop MP4 / MOV here or click to browse</div>
-            <div class="drop-hint">Will be uploaded to Google Drive</div>
-            <input type="file" id="fVidFile" accept="video/mp4,video/mov,video/quicktime,.mp4,.mov" onchange="onFileVid(this)">
+          <label class="label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Pick from Google Drive</span>
+            <button onclick="loadDriveFiles()" type="button" style="font-size:11px;font-family:'Inter',sans-serif;background:none;border:1px solid var(--gray-200);border-radius:5px;padding:3px 10px;cursor:pointer;color:var(--blue);font-weight:500">↻ Refresh list</button>
+          </label>
+          <select class="inp" id="fVidPick" onchange="onDrivePick('video')" style="cursor:pointer">
+            <option value="">— Loading your Drive files… —</option>
+          </select>
+          <div style="margin-top:6px;font-size:11.5px;color:var(--gray-400)">
+            Upload your video to <a href="https://drive.google.com/drive/folders/1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA" target="_blank" style="color:var(--blue)">your Drive folder</a> first, then refresh the list above.
           </div>
-          <div id="vidFilePill" style="display:none"></div>
         </div>
         <div class="field">
           <label class="label" style="display:flex;align-items:center;gap:8px">
             <span>Or paste YouTube URL</span>
-            <span style="font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0">optional if uploading a file</span>
+            <span style="font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0">optional</span>
           </label>
           <input class="inp" type="text" id="fUrl" placeholder="https://youtube.com/watch?v=…">
         </div>
@@ -936,19 +935,20 @@ body {
         </div>
       </div>
 
-      <!-- PDF upload -->
-      <div class="field" id="wFile" style="display:none">
-        <label class="label">Document file</label>
-        <div class="drop" id="drop"
-             onclick="document.getElementById('fFile').click()"
-             ondragover="event.preventDefault();this.classList.add('over')"
-             ondragleave="this.classList.remove('over')"
-             ondrop="onDrop(event)">
-          <div class="drop-title">Drop PDF / PPTX / DOCX here or click to browse</div>
-          <div class="drop-hint">Will be uploaded to Google Drive</div>
-          <input type="file" id="fFile" accept=".pdf,.pptx,.docx,application/pdf" onchange="onFile(this)">
+      <!-- Document section -->
+      <div id="wFile" style="display:none">
+        <div class="field">
+          <label class="label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Pick from Google Drive</span>
+            <button onclick="loadDriveFiles()" type="button" style="font-size:11px;font-family:'Inter',sans-serif;background:none;border:1px solid var(--gray-200);border-radius:5px;padding:3px 10px;cursor:pointer;color:var(--blue);font-weight:500">↻ Refresh list</button>
+          </label>
+          <select class="inp" id="fDocPick" onchange="onDrivePick('pdf')" style="cursor:pointer">
+            <option value="">— Loading your Drive files… —</option>
+          </select>
+          <div style="margin-top:6px;font-size:11.5px;color:var(--gray-400)">
+            Upload your PDF to <a href="https://drive.google.com/drive/folders/1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA" target="_blank" style="color:var(--blue)">your Drive folder</a> first, then refresh the list above.
+          </div>
         </div>
-        <div id="filePill" style="display:none"></div>
       </div>
 
       <div class="field">
@@ -1014,101 +1014,13 @@ body {
 
 <script>
 // ── Config ──
-const GAS_URL     = 'https://script.google.com/macros/s/AKfycbwHJiCRnKgGj8UpLhfDNt_ubV-rgw58IoNkrTEAu0o_Gi0ebX_JwMqJbF1Gfj9Ts3Hc/exec';
-const CLIENT_ID   = '337496933716-07v4qtloi5d0u3u1a61ccod65b8romha.apps.googleusercontent.com';
-const FOLDER_ID   = '1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA';
-const SCOPES      = 'https://www.googleapis.com/auth/drive.file';
-const TAG_LABELS  = { ai:'AI', prompts:'Prompts', computer:'Computer', tools:'Tools', workflow:'Workflow' };
-const ADMIN_PASS  = '2846';
+const GAS_URL    = 'https://script.google.com/macros/s/AKfycbwHJiCRnKgGj8UpLhfDNt_ubV-rgw58IoNkrTEAu0o_Gi0ebX_JwMqJbF1Gfj9Ts3Hc/exec';
+const API_KEY    = 'AIzaSyBbdJkn_bQNjJ27EFFwcVi05URcjEP6-pM';
+const FOLDER_ID  = '1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA';
+const TAG_LABELS = { ai:'AI', prompts:'Prompts', computer:'Computer', tools:'Tools', workflow:'Workflow' };
+const ADMIN_PASS = '2846';
 
-let accessToken = null;
-
-// ── Google Identity Services (OAuth) ──
-function loadGIS() {
-  return new Promise(resolve => {
-    if (window.google && window.google.accounts) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = resolve;
-    document.head.appendChild(s);
-  });
-}
-
-async function getAccessToken() {
-  if (accessToken) return accessToken;
-  await loadGIS();
-  return new Promise((resolve, reject) => {
-    const client = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: res => {
-        if (res.error) { reject(res.error); return; }
-        accessToken = res.access_token;
-        // Token expires in 1hr — clear it so next upload re-authenticates
-        setTimeout(() => { accessToken = null; }, 3500000);
-        resolve(accessToken);
-      }
-    });
-    client.requestAccessToken({ prompt: accessToken ? '' : 'none' });
-  });
-}
-
-// ── Direct Drive upload with progress bar ──
-async function uploadFileToDrive(file, onProgress) {
-  const token = await getAccessToken();
-
-  // 1. Create file metadata
-  const meta = JSON.stringify({ name: file.name, parents: [FOLDER_ID] });
-  const initRes = await fetch(
-    'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-Upload-Content-Type': file.type || 'application/octet-stream',
-        'X-Upload-Content-Length': file.size
-      },
-      body: meta
-    }
-  );
-
-  if (!initRes.ok) throw new Error('Could not initiate upload');
-  const uploadUrl = initRes.headers.get('Location');
-
-  // 2. Upload file in one chunk (resumable, with XHR for progress)
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('PUT', uploadUrl, true);
-    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-
-    xhr.upload.onprogress = e => {
-      if (e.lengthComputable && onProgress) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
-      }
-    };
-
-    xhr.onload = async () => {
-      if (xhr.status === 200 || xhr.status === 201) {
-        const data = JSON.parse(xhr.responseText);
-        const fileId = data.id;
-        // Make file publicly viewable
-        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role:'reader', type:'anyone' })
-        });
-        const viewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-        resolve({ status:'ok', fileId, viewUrl, fileName: file.name });
-      } else {
-        reject(new Error('Upload failed: ' + xhr.status));
-      }
-    };
-
-    xhr.onerror = () => reject(new Error('Network error during upload'));
-    xhr.send(file);
-  });
-}
+let driveFiles = []; // cache of files in Drive folder
 
 // ── Admin state ──
 let isAdmin = false;
@@ -1327,13 +1239,12 @@ function openModal(isEdit) {
     document.getElementById('fDesc').value  = '';
     document.getElementById('fUrl').value   = '';
     document.getElementById('fDur').value   = '';
-    document.getElementById('filePill').style.display = 'none';
-    document.getElementById('vidFilePill').style.display = 'none';
     selTopics = new Set(['ai']);
     syncTopics();
     pickType(document.getElementById('optVid'), 'video');
     document.getElementById('modalTitle').textContent = 'Add resource';
     document.getElementById('btnSave').textContent = 'Save resource';
+    loadDriveFiles();
   }
   document.getElementById('overlay').classList.add('open');
 }
@@ -1362,86 +1273,106 @@ function syncTopics() {
   });
 }
 
-// PDF file
-function onFile(inp) { selFile = inp.files[0]; showPill('filePill', selFile.name); }
-function onDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop').classList.remove('over');
-  selFile = e.dataTransfer.files[0]; showPill('filePill', selFile.name);
+// ── Load Drive folder files via API Key ──
+async function loadDriveFiles() {
+  const vidSel = document.getElementById('fVidPick');
+  const docSel = document.getElementById('fDocPick');
+  if (vidSel) vidSel.innerHTML = '<option value="">— Loading… —</option>';
+  if (docSel) docSel.innerHTML = '<option value="">— Loading… —</option>';
+
+  try {
+    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType)&key=${API_KEY}`;
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    if (data.error) {
+      const msg = '<option value="">— Error loading files —</option>';
+      if (vidSel) vidSel.innerHTML = msg;
+      if (docSel) docSel.innerHTML = msg;
+      return;
+    }
+
+    driveFiles = data.files || [];
+
+    const videos = driveFiles.filter(f => f.mimeType.startsWith('video/'));
+    const docs   = driveFiles.filter(f =>
+      f.mimeType === 'application/pdf' ||
+      f.mimeType.includes('presentation') ||
+      f.mimeType.includes('document') ||
+      f.name.match(/\.(pdf|pptx|docx)$/i)
+    );
+
+    const makeOpts = (files, placeholder) =>
+      `<option value="">${placeholder}</option>` +
+      files.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name}</option>`).join('');
+
+    if (vidSel) vidSel.innerHTML = makeOpts(videos, videos.length ? '— Select a video —' : '— No videos in Drive folder yet —');
+    if (docSel) docSel.innerHTML = makeOpts(docs,   docs.length   ? '— Select a document —' : '— No documents in Drive folder yet —');
+
+  } catch(e) {
+    const msg = '<option value="">— Could not reach Drive —</option>';
+    if (vidSel) vidSel.innerHTML = msg;
+    if (docSel) docSel.innerHTML = msg;
+  }
 }
 
-// Video file
-function onFileVid(inp) { selVidFile = inp.files[0]; showPill('vidFilePill', selVidFile.name); }
-function onDropVid(e) {
-  e.preventDefault();
-  document.getElementById('dropVid').classList.remove('over');
-  selVidFile = e.dataTransfer.files[0]; showPill('vidFilePill', selVidFile.name);
+// When user picks a file from dropdown
+function onDrivePick(type) {
+  const sel = document.getElementById(type === 'video' ? 'fVidPick' : 'fDocPick');
+  const fileId = sel.value;
+  if (!fileId) return;
+  const fileName = sel.options[sel.selectedIndex].dataset.name || '';
+  // Auto-fill title if empty
+  if (!document.getElementById('fTitle').value.trim()) {
+    document.getElementById('fTitle').value = fileName.replace(/\.[^.]+$/, '');
+  }
 }
 
-function showPill(pillId, name) {
-  const p = document.getElementById(pillId);
-  p.style.display = 'block';
-  const rmFn = pillId === 'filePill' ? 'clearFile()' : 'clearVidFile()';
-  p.innerHTML = `<div class="file-row"><span>📎</span><span class="file-name">${name}</span><span class="file-rm" onclick="${rmFn}">✕</span></div>`;
-}
+// ── File handlers (kept for compatibility, not used anymore) ──
+function onFile(inp)    {}
+function onDrop(e)      { e.preventDefault(); }
+function onFileVid(inp) {}
+function onDropVid(e)   { e.preventDefault(); }
+function clearFile()    {}
+function clearVidFile() {}
 
-function clearFile()    { selFile=null;    document.getElementById('fFile').value='';    document.getElementById('filePill').style.display='none'; }
-function clearVidFile() { selVidFile=null; document.getElementById('fVidFile').value=''; document.getElementById('vidFilePill').style.display='none'; }
-
-// ── Save (add or edit) ──
+// ── Save ──
 async function save() {
   const title = document.getElementById('fTitle').value.trim();
-  if (!title) { document.getElementById('fTitle').style.borderColor='#e05535'; document.getElementById('fTitle').focus(); return; }
+  if (!title) {
+    document.getElementById('fTitle').style.borderColor = '#e05535';
+    document.getElementById('fTitle').focus();
+    return;
+  }
   document.getElementById('fTitle').style.borderColor = '';
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
+  btn.textContent = 'Saving…';
 
-  let url      = document.getElementById('fUrl').value.trim();
+  let url      = document.getElementById('fUrl')?.value.trim() || '';
   let fileId   = '';
   let fileName = '';
 
-  // Auto-convert YouTube watch → embed
-  url = url.replace('watch?v=','embed/').replace('youtu.be/','www.youtube.com/embed/');
+  // YouTube auto-convert
+  url = url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/');
 
-  // Upload video file directly to Drive
-  if (selType === 'video' && selVidFile) {
-    showProgress(0, selVidFile.name);
-    try {
-      const res = await uploadFileToDrive(selVidFile, pct => showProgress(pct, selVidFile.name));
-      if (res.viewUrl) url = res.viewUrl;
-      fileId   = res.fileId   || '';
-      fileName = res.fileName || selVidFile.name;
-      showProgress(100, selVidFile.name);
-    } catch(e) {
-      hideProgress();
-      // If OAuth popup was blocked or cancelled, ask user to try again
-      toast('Sign in with Google to upload files, then try again.');
-      btn.disabled = false; btn.textContent = editId ? 'Save changes' : 'Save resource';
-      return;
+  // Get selected Drive file
+  if (selType === 'video') {
+    const sel = document.getElementById('fVidPick');
+    if (sel && sel.value) {
+      fileId   = sel.value;
+      fileName = sel.options[sel.selectedIndex].dataset.name || '';
+      if (!url) url = `https://drive.google.com/file/d/${fileId}/preview`;
     }
-    hideProgress();
-  }
-
-  // Upload PDF file directly to Drive
-  if (selType === 'pdf' && selFile) {
-    showProgress(0, selFile.name);
-    try {
-      const res = await uploadFileToDrive(selFile, pct => showProgress(pct, selFile.name));
-      if (res.viewUrl) url = res.viewUrl;
-      fileId   = res.fileId   || '';
-      fileName = res.fileName || selFile.name;
-      showProgress(100, selFile.name);
-    } catch(e) {
-      hideProgress();
-      toast('Sign in with Google to upload files, then try again.');
-      btn.disabled = false; btn.textContent = editId ? 'Save changes' : 'Save resource';
-      return;
+  } else {
+    const sel = document.getElementById('fDocPick');
+    if (sel && sel.value) {
+      fileId   = sel.value;
+      fileName = sel.options[sel.selectedIndex].dataset.name || '';
+      url = `https://drive.google.com/file/d/${fileId}/preview`;
     }
-    hideProgress();
   }
-
-  btn.textContent = 'Saving…';
 
   const common = {
     type:  selType,
@@ -1449,22 +1380,22 @@ async function save() {
     desc:  document.getElementById('fDesc').value.trim() || '',
     tags:  [...selTopics].join(','),
     url,
-    dur:   document.getElementById('fDur').value.trim(),
-    date:  new Date().toISOString().slice(0,10),
+    dur:   document.getElementById('fDur')?.value.trim() || '',
+    date:  new Date().toISOString().slice(0, 10),
     file:  fileName,
     fileId
   };
 
   if (editId) {
-    await gasPost({ action:'edit', id: editId, ...common });
+    await gasPost({ action: 'edit', id: editId, ...common });
     const idx = items.findIndex(i => i.id === editId);
-    if (idx > -1) items[idx] = { id:editId, ...common, tags:[...selTopics] };
+    if (idx > -1) items[idx] = { id: editId, ...common, tags: [...selTopics] };
     editId = null;
     toast('Resource updated.');
   } else {
     const id = genId();
-    await gasPost({ action:'add', id, ...common });
-    items.unshift({ id, ...common, tags:[...selTopics] });
+    await gasPost({ action: 'add', id, ...common });
+    items.unshift({ id, ...common, tags: [...selTopics] });
     toast('Resource saved — visible to everyone now.');
   }
 
@@ -1472,33 +1403,12 @@ async function save() {
   btn.textContent = 'Save resource';
   closeModal();
   render();
-  setTimeout(loadFromSheet, 2500);
+  setTimeout(loadFromSheet, 2000);
 }
 
-// ── Progress bar ──
-function showProgress(pct, fileName) {
-  let bar = document.getElementById('uploadBar');
-  if (!bar) {
-    bar = document.createElement('div');
-    bar.id = 'uploadBar';
-    bar.style.cssText = `position:fixed;bottom:0;left:0;right:0;z-index:9999;background:white;border-top:1px solid var(--gray-200);padding:12px 24px;display:flex;align-items:center;gap:14px;font-family:'Inter',sans-serif;font-size:13px;`;
-    bar.innerHTML = `
-      <span id="upFileName" style="color:var(--gray-700);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <div style="width:200px;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden;flex-shrink:0">
-        <div id="upFill" style="height:100%;background:var(--blue);border-radius:3px;width:0%;transition:width 0.2s"></div>
-      </div>
-      <span id="upPct" style="color:var(--blue);font-weight:600;min-width:36px;text-align:right">0%</span>`;
-    document.body.appendChild(bar);
-  }
-  document.getElementById('upFileName').textContent = `Uploading ${fileName}`;
-  document.getElementById('upFill').style.width = pct + '%';
-  document.getElementById('upPct').textContent  = pct + '%';
-}
-
-function hideProgress() {
-  const bar = document.getElementById('uploadBar');
-  if (bar) { setTimeout(() => bar.remove(), 600); }
-}
+// ── Progress bar (kept but unused now) ──
+function showProgress(pct, fileName) {}
+function hideProgress() {}
 
 // ── Edit ──
 function startEdit(id) {
@@ -1578,3 +1488,6 @@ loadFromSheet();
 </script>
 </body>
 </html>
+  
+
+ 
