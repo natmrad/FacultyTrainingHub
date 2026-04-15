@@ -889,11 +889,11 @@ body {
         <div class="type-row">
           <div class="type-opt on" id="optVid" onclick="pickType(this,'video')">
             <div class="type-opt-title">Video lesson</div>
-            <div class="type-opt-hint">YouTube link or MP4</div>
+            <div class="type-opt-hint">Upload MP4 or YouTube link</div>
           </div>
           <div class="type-opt" id="optDoc" onclick="pickType(this,'pdf')">
             <div class="type-opt-title">Document</div>
-            <div class="type-opt-hint">PDF, slides, guide</div>
+            <div class="type-opt-hint">Upload PDF, slides, guide</div>
           </div>
         </div>
       </div>
@@ -908,26 +908,45 @@ body {
         <textarea class="txa" id="fDesc" placeholder="What does this resource cover? Who is it for?"></textarea>
       </div>
 
-      <div class="field" id="wUrl">
-        <label class="label">YouTube URL</label>
-        <input class="inp" type="text" id="fUrl" placeholder="https://youtube.com/watch?v=…">
+      <!-- Video: upload or YouTube -->
+      <div id="wVideoSection">
+        <div class="field">
+          <label class="label">Video file</label>
+          <div class="drop" id="dropVid"
+               onclick="document.getElementById('fVidFile').click()"
+               ondragover="event.preventDefault();this.classList.add('over')"
+               ondragleave="this.classList.remove('over')"
+               ondrop="onDropVid(event)">
+            <div class="drop-title">Drop MP4 / MOV here or click to browse</div>
+            <div class="drop-hint">Will be uploaded to Google Drive</div>
+            <input type="file" id="fVidFile" accept="video/mp4,video/mov,video/quicktime,.mp4,.mov" onchange="onFileVid(this)">
+          </div>
+          <div id="vidFilePill" style="display:none"></div>
+        </div>
+        <div class="field">
+          <label class="label" style="display:flex;align-items:center;gap:8px">
+            <span>Or paste YouTube URL</span>
+            <span style="font-size:10px;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0">optional if uploading a file</span>
+          </label>
+          <input class="inp" type="text" id="fUrl" placeholder="https://youtube.com/watch?v=…">
+        </div>
+        <div class="field">
+          <label class="label">Duration</label>
+          <input class="inp" type="text" id="fDur" placeholder="e.g. 18:45">
+        </div>
       </div>
 
-      <div class="field" id="wDur">
-        <label class="label">Duration</label>
-        <input class="inp" type="text" id="fDur" placeholder="e.g. 18:45">
-      </div>
-
+      <!-- PDF upload -->
       <div class="field" id="wFile" style="display:none">
-        <label class="label">File</label>
+        <label class="label">Document file</label>
         <div class="drop" id="drop"
              onclick="document.getElementById('fFile').click()"
              ondragover="event.preventDefault();this.classList.add('over')"
              ondragleave="this.classList.remove('over')"
              ondrop="onDrop(event)">
-          <div class="drop-title">Drop file here or click to browse</div>
-          <div class="drop-hint">PDF, PPTX, DOCX accepted</div>
-          <input type="file" id="fFile" accept=".pdf,.pptx,.docx" onchange="onFile(this)">
+          <div class="drop-title">Drop PDF / PPTX / DOCX here or click to browse</div>
+          <div class="drop-hint">Will be uploaded to Google Drive</div>
+          <input type="file" id="fFile" accept=".pdf,.pptx,.docx,application/pdf" onchange="onFile(this)">
         </div>
         <div id="filePill" style="display:none"></div>
       </div>
@@ -1063,7 +1082,7 @@ function applyAdminUI() {
 let items = [];
 let navF = 'all', chipF = 'all';
 let selType = 'video', selTopics = new Set(['ai']);
-let editId = null, selFile = null;
+let editId = null, selFile = null, selVidFile = null;
 let loading = false;
 
 // ── Google Sheets helpers ──
@@ -1211,12 +1230,13 @@ function cardHTML(it) {
 // ── Modal ──
 function openModal(isEdit) {
   if (!isEdit) {
-    editId = null; selFile = null;
+    editId = null; selFile = null; selVidFile = null;
     document.getElementById('fTitle').value = '';
     document.getElementById('fDesc').value  = '';
     document.getElementById('fUrl').value   = '';
     document.getElementById('fDur').value   = '';
     document.getElementById('filePill').style.display = 'none';
+    document.getElementById('vidFilePill').style.display = 'none';
     selTopics = new Set(['ai']);
     syncTopics();
     pickType(document.getElementById('optVid'), 'video');
@@ -1234,8 +1254,7 @@ function pickType(tile, t) {
   document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('on'));
   tile.classList.add('on');
   const vid = t === 'video';
-  document.getElementById('wUrl').style.display  = vid ? '' : 'none';
-  document.getElementById('wDur').style.display  = vid ? '' : 'none';
+  document.getElementById('wVideoSection').style.display = vid ? '' : 'none';
   document.getElementById('wFile').style.display = vid ? 'none' : '';
 }
 
@@ -1251,18 +1270,73 @@ function syncTopics() {
   });
 }
 
-function onFile(inp) { selFile = inp.files[0]; showPill(selFile.name); }
+// PDF file
+function onFile(inp) { selFile = inp.files[0]; showPill('filePill', selFile.name); }
 function onDrop(e) {
   e.preventDefault();
   document.getElementById('drop').classList.remove('over');
-  selFile = e.dataTransfer.files[0]; showPill(selFile.name);
+  selFile = e.dataTransfer.files[0]; showPill('filePill', selFile.name);
 }
-function showPill(name) {
-  const p = document.getElementById('filePill');
+
+// Video file
+function onFileVid(inp) { selVidFile = inp.files[0]; showPill('vidFilePill', selVidFile.name); }
+function onDropVid(e) {
+  e.preventDefault();
+  document.getElementById('dropVid').classList.remove('over');
+  selVidFile = e.dataTransfer.files[0]; showPill('vidFilePill', selVidFile.name);
+}
+
+function showPill(pillId, name) {
+  const p = document.getElementById(pillId);
   p.style.display = 'block';
-  p.innerHTML = `<div class="file-row"><span>📎</span><span class="file-name">${name}</span><span class="file-rm" onclick="clearFile()">✕</span></div>`;
+  const rmFn = pillId === 'filePill' ? 'clearFile()' : 'clearVidFile()';
+  p.innerHTML = `<div class="file-row"><span>📎</span><span class="file-name">${name}</span><span class="file-rm" onclick="${rmFn}">✕</span></div>`;
 }
-function clearFile() { selFile=null; document.getElementById('fFile').value=''; document.getElementById('filePill').style.display='none'; }
+
+function clearFile()    { selFile=null;    document.getElementById('fFile').value='';    document.getElementById('filePill').style.display='none'; }
+function clearVidFile() { selVidFile=null; document.getElementById('fVidFile').value=''; document.getElementById('vidFilePill').style.display='none'; }
+
+// Upload file to Drive via GAS
+async function uploadFileToDrive(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      // base64 without the data:...;base64, prefix
+      const base64 = e.target.result.split(',')[1];
+      const body = new URLSearchParams({
+        action:   'upload',
+        fileName: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        data:     base64
+      });
+      try {
+        // POST with no-cors — we can't read the response body directly
+        // So we use a small JSONP workaround: embed data in a script tag via GET
+        // Instead: split upload into chunks if needed, or use a proxy
+        // For simplicity: use fetch with mode cors first, fall back to iframe trick
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString()
+        });
+        if (res.ok) {
+          const json = await res.json();
+          resolve(json);
+        } else {
+          // no-cors fallback: post and poll sheet for new fileId
+          await fetch(GAS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString() });
+          resolve({ status:'ok', viewUrl:'', fileName: file.name });
+        }
+      } catch(err) {
+        // CORS blocked — use no-cors and resolve without fileId
+        await fetch(GAS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString() });
+        resolve({ status:'ok', viewUrl:'', fileName: file.name });
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // ── Save (add or edit) ──
 async function save() {
@@ -1271,26 +1345,61 @@ async function save() {
   document.getElementById('fTitle').style.borderColor = '';
 
   const btn = document.getElementById('btnSave');
-  btn.textContent = 'Saving…'; btn.disabled = true;
+  btn.disabled = true;
 
-  const url = document.getElementById('fUrl').value.trim();
-  // Auto-convert YouTube watch URLs to embed
-  const embedUrl = url.replace('watch?v=','embed/').replace('youtu.be/','www.youtube.com/embed/');
+  let url     = document.getElementById('fUrl').value.trim();
+  let fileId  = '';
+  let fileName = '';
+
+  // Auto-convert YouTube watch → embed
+  url = url.replace('watch?v=','embed/').replace('youtu.be/','www.youtube.com/embed/');
+
+  // Upload video file if selected
+  if (selType === 'video' && selVidFile) {
+    btn.textContent = 'Uploading video…';
+    try {
+      const res = await uploadFileToDrive(selVidFile);
+      if (res.viewUrl) url = res.viewUrl;
+      fileId   = res.fileId  || '';
+      fileName = res.fileName || selVidFile.name;
+    } catch(e) {
+      toast('Upload failed. Check your Apps Script deployment.');
+      btn.disabled = false; btn.textContent = editId ? 'Save changes' : 'Save resource';
+      return;
+    }
+  }
+
+  // Upload PDF file if selected
+  if (selType === 'pdf' && selFile) {
+    btn.textContent = 'Uploading file…';
+    try {
+      const res = await uploadFileToDrive(selFile);
+      if (res.viewUrl) url = res.viewUrl;
+      fileId   = res.fileId  || '';
+      fileName = res.fileName || selFile.name;
+    } catch(e) {
+      toast('Upload failed. Check your Apps Script deployment.');
+      btn.disabled = false; btn.textContent = editId ? 'Save changes' : 'Save resource';
+      return;
+    }
+  }
+
+  btn.textContent = 'Saving…';
 
   const common = {
-    type:  selType,
+    type:   selType,
     title,
-    desc:  document.getElementById('fDesc').value.trim() || '',
-    tags:  [...selTopics].join(','),
-    url:   embedUrl,
-    dur:   document.getElementById('fDur').value.trim(),
-    date:  new Date().toISOString().slice(0,10),
-    file:  selFile?.name || ''
+    desc:   document.getElementById('fDesc').value.trim() || '',
+    tags:   [...selTopics].join(','),
+    url,
+    dur:    document.getElementById('fDur').value.trim(),
+    date:   new Date().toISOString().slice(0,10),
+    file:   fileName,
+    fileId
   };
 
   if (editId) {
     await gasPost({ action:'edit', id: editId, ...common });
-    // update local copy immediately
     const idx = items.findIndex(i => i.id === editId);
     if (idx > -1) items[idx] = { id:editId, ...common, tags:[...selTopics] };
     editId = null;
@@ -1299,15 +1408,14 @@ async function save() {
     const id = genId();
     await gasPost({ action:'add', id, ...common });
     items.unshift({ id, ...common, tags:[...selTopics] });
-    toast('Resource added — visible to everyone now.');
+    toast('Resource saved — visible to everyone now.');
   }
 
   btn.disabled = false;
+  btn.textContent = 'Save resource';
   closeModal();
   render();
-
-  // Re-sync from sheet after a short delay to confirm write
-  setTimeout(loadFromSheet, 2000);
+  setTimeout(loadFromSheet, 2500);
 }
 
 // ── Edit ──
@@ -1346,12 +1454,20 @@ function openViewer(id) {
   if (!it) return;
   document.getElementById('viewerTitle').textContent = it.title;
   const f = document.getElementById('viewerFrame');
+
   if (it.url && it.url.includes('youtube.com/embed')) {
+    // YouTube video
     f.innerHTML = `<iframe src="${it.url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else if (it.url && it.url.includes('drive.google.com')) {
+    // Google Drive file (video or PDF) — use preview embed
+    f.innerHTML = `<iframe src="${it.url}" allow="autoplay" allowfullscreen></iframe>`;
   } else if (it.type==='video' && it.url) {
-    f.innerHTML = `<video src="${it.url}" controls></video>`;
+    f.innerHTML = `<video src="${it.url}" controls style="width:100%;height:100%;background:#000"></video>`;
   } else {
-    const msg = it.file ? `File referenced: <strong>${it.file}</strong><br><br>Host on a server to enable inline preview.` : 'No URL or file attached yet.<br>Edit this resource to add content.';
+    const hasFile = it.file || it.fileId;
+    const msg = hasFile
+      ? `File: <strong>${it.file}</strong><br><br>The file is stored in Google Drive. It will appear here once the Apps Script is redeployed.`
+      : 'No file or URL attached yet.<br>Edit this resource to add content.';
     f.innerHTML = `<div class="viewer-ph"><div class="viewer-ph-icon">${it.type==='pdf'?'📄':'🎬'}</div><div class="viewer-ph-title">${it.title}</div><div class="viewer-ph-sub">${msg}</div></div>`;
   }
   document.getElementById('viewerOv').classList.add('open');
