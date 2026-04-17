@@ -492,6 +492,11 @@ body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-9
         <input class="inp" type="password" id="adminPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkAdmin()">
         <div id="adminErr" style="display:none;margin-top:6px;font-size:12px;color:var(--red)">Incorrect password.</div>
       </div>
+      <div class="field">
+        <label class="label">Google Drive API Key <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-400)">only needed to pick Drive files</span></label>
+        <input class="inp" type="password" id="adminApiKey" placeholder="AIza…" autocomplete="off">
+        <div style="margin-top:5px;font-size:11.5px;color:var(--gray-400)">Stored only in your browser session — never in the code.</div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
@@ -521,10 +526,12 @@ body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-9
 <script>
 // ══ CONFIG ══
 const GAS_URL   = 'https://script.google.com/macros/s/AKfycbwHJiCRnKgGj8UpLhfDNt_ubV-rgw58IoNkrTEAu0o_Gi0ebX_JwMqJbF1Gfj9Ts3Hc/exec';
-const API_KEY   = 'AIzaSyBbdJkn_bQNjJ27EFFwcVi05URcjEP6-pM';
 const FOLDER_ID = '1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA';
 const PASS      = '2846';
 const TAG_LABELS= {ai:'AI',prompts:'Prompts',computer:'Computer',tools:'Tools',workflow:'Workflow'};
+
+// API key is entered by admin at runtime — never stored in code
+let DRIVE_API_KEY = sessionStorage.getItem('fth_apikey') || '';
 
 // ══ STATE ══
 let resources = [];   // all resources from sheet
@@ -746,12 +753,13 @@ function onSearch() { if(currentPage==='all') renderAllGrid(); }
 
 // ══ DRIVE FILES ══
 async function loadDriveFiles() {
+  if (!DRIVE_API_KEY) { toast('Enter your Drive API key when signing in as admin.'); return; }
   const vSel = document.getElementById('rVidPick');
   const dSel = document.getElementById('rDocPick');
   if(vSel) vSel.innerHTML = '<option>— Loading… —</option>';
   if(dSel) dSel.innerHTML = '<option>— Loading… —</option>';
   try {
-    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType)&key=${API_KEY}`;
+    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType)&key=${DRIVE_API_KEY}`;
     const res  = await fetch(url);
     const data = await res.json();
     driveFiles = data.files || [];
@@ -990,6 +998,8 @@ function handleAdminToggle() {
 function closeAdminModal(){ document.getElementById('adminOverlay').classList.remove('open'); }
 function checkAdmin(){
   if(document.getElementById('adminPw').value===PASS){
+    const apiKey = document.getElementById('adminApiKey').value.trim();
+    if(apiKey){ DRIVE_API_KEY = apiKey; sessionStorage.setItem('fth_apikey', apiKey); }
     isAdmin=true; sessionStorage.setItem('fth_a','1');
     closeAdminModal(); applyAdmin(); toast('Admin access granted.');
   } else { document.getElementById('adminErr').style.display='block'; document.getElementById('adminPw').value=''; }
