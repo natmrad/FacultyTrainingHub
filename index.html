@@ -725,8 +725,10 @@ function renderModulesGrid() {
   }
   el.innerHTML = modules.map(m => {
     const count = resources.filter(r=>r.modules.includes(m.id)).length;
+    const imgFileId = m.img ? m.img.match(/\/d\/([^/]+)\/preview/) : null;
+    const thumbUrl  = imgFileId ? `https://drive.google.com/thumbnail?id=${imgFileId[1]}&sz=w400` : '';
     const cover = m.img
-      ? `<div style="width:100%;height:110px;overflow:hidden;border-radius:8px;border:1px solid var(--gray-200);flex-shrink:0"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='📚'"></div>`
+      ? `<div style="width:100%;height:110px;overflow:hidden;border-radius:8px;border:1px solid var(--gray-200);flex-shrink:0"><img src="${thumbUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=font-size:32px>📚</span>'"></div>`
       : `<div class="module-icon">${m.icon||'📚'}</div>`;
     return `<div class="module-card" onclick="openModulePage('${m.id}');highlightSbItem(document.querySelector('#sbModules .sb-item:nth-child(${modules.indexOf(m)+1})'))">
       <div class="module-card-head">
@@ -950,14 +952,14 @@ async function loadDriveImages() {
   const sel = document.getElementById('mImgPick');
   sel.innerHTML = '<option>— Loading… —</option>';
   try {
-    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType)&key=${DRIVE_API_KEY}`;
+    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType,thumbnailLink)&key=${DRIVE_API_KEY}`;
     const res  = await fetch(url);
     const data = await res.json();
     const imgs = (data.files||[]).filter(f => f.mimeType.startsWith('image/'));
     if (!imgs.length) { sel.innerHTML = '<option value="">— No images in Drive folder yet —</option>'; return; }
+    // store both the embed URL (for saving) and thumbnail (for preview) as data attributes
     sel.innerHTML = '<option value="">— Select an image —</option>' +
-      imgs.map(f => `<option value="https://drive.google.com/uc?export=view&id=${f.id}" data-name="${f.name}">${f.name}</option>`).join('');
-    // restore selected if editing
+      imgs.map(f => `<option value="https://drive.google.com/file/d/${f.id}/preview" data-thumb="https://drive.google.com/thumbnail?id=${f.id}&sz=w400" data-name="${f.name}">${f.name}</option>`).join('');
     if (modImgUrl) { [...sel.options].forEach(o => { if(o.value===modImgUrl) o.selected=true; }); }
   } catch(e) {
     sel.innerHTML = '<option value="">— Could not load Drive images —</option>';
@@ -965,15 +967,22 @@ async function loadDriveImages() {
 }
 
 function onModImgPick() {
-  const sel = document.getElementById('mImgPick');
-  modImgUrl = sel.value;
-  const thumb = document.getElementById('modImgThumb');
+  const sel   = document.getElementById('mImgPick');
+  const opt   = sel.options[sel.selectedIndex];
+  modImgUrl   = sel.value;
+  const thumb = opt ? opt.dataset.thumb : '';
+  const img   = document.getElementById('modImgThumb');
   const ph    = document.getElementById('modImgPlaceholder');
   const clear = document.getElementById('modImgClearWrap');
-  if (modImgUrl) {
-    thumb.src = modImgUrl; thumb.style.display='block'; ph.style.display='none'; clear.style.display='block';
+  if (modImgUrl && thumb) {
+    img.src = thumb;
+    img.style.display = 'block';
+    ph.style.display  = 'none';
+    clear.style.display = 'block';
   } else {
-    thumb.style.display='none'; ph.style.display='flex'; clear.style.display='none';
+    img.style.display = 'none';
+    ph.style.display  = 'flex';
+    clear.style.display = 'none';
   }
 }
 
