@@ -457,30 +457,25 @@ body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-9
         <textarea class="txa" id="mDesc" placeholder="What will instructors learn in this module?" style="min-height:64px"></textarea>
       </div>
 
-      <!-- Cover image or emoji -->
+      <!-- Cover image -->
       <div class="field">
         <label class="label">Cover Image</label>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <!-- Preview -->
-          <div id="modImgPreview" style="width:90px;height:90px;border-radius:10px;border:1.5px dashed var(--gray-300);background:var(--gray-100);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative">
-            <div id="modImgPlaceholder" style="text-align:center;padding:6px">
-              <div style="font-size:22px">🖼</div>
-              <div style="font-size:9px;color:var(--gray-400);margin-top:3px">No image</div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <!-- Preview box -->
+          <div id="modImgPreview" style="width:90px;height:90px;border-radius:10px;border:1.5px dashed var(--gray-300);background:var(--gray-100);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative;cursor:pointer" onclick="document.getElementById('mImgFile').click()">
+            <div id="modImgPlaceholder" style="text-align:center">
+              <div style="font-size:24px">🖼</div>
+              <div style="font-size:9px;color:var(--gray-400);margin-top:3px;font-weight:500">Click to upload</div>
             </div>
-            <img id="modImgThumb" style="display:none;width:100%;height:100%;object-fit:cover">
+            <img id="modImgThumb" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+            <div id="modImgSpinner" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,.8);align-items:center;justify-content:center"><div class="spinner"></div></div>
           </div>
+          <input type="file" id="mImgFile" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="onModImg(this)">
 
           <div style="flex:1">
-            <!-- Drive image picker -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <div style="font-size:11.5px;font-weight:600;color:var(--gray-700)">Pick from Google Drive</div>
-              <button class="refresh-btn" onclick="loadDriveImages()">↻ Refresh</button>
-            </div>
-            <select class="inp" id="mImgPick" onchange="onModImgPick()" style="cursor:pointer;font-size:12px">
-              <option value="">— Select an image —</option>
-            </select>
-            <div class="drive-hint" style="margin-top:5px">Upload your image to <a href="https://drive.google.com/drive/folders/1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA" target="_blank">your Drive folder</a>, then Refresh.</div>
-            <div id="modImgClearWrap" style="display:none;margin-top:6px">
+            <div style="font-size:12px;color:var(--gray-700);font-weight:500;margin-bottom:4px">Upload any JPG or PNG</div>
+            <div style="font-size:11.5px;color:var(--gray-400);line-height:1.6">Image is hosted publicly and stored permanently — never disappears.</div>
+            <div id="modImgClearWrap" style="display:none;margin-top:8px">
               <button onclick="clearModImg()" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0">✕ Remove image</button>
             </div>
           </div>
@@ -489,7 +484,7 @@ body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-9
 
       <!-- Emoji fallback -->
       <div class="field">
-        <label class="label">Or pick an emoji <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-400)">used if no image selected</span></label>
+        <label class="label">Or pick an emoji <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-400)">used if no image uploaded</span></label>
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="iconPicker">
           <span class="icon-opt on" onclick="pickIcon(this)">📚</span>
           <span class="icon-opt" onclick="pickIcon(this)">🤖</span>
@@ -725,10 +720,8 @@ function renderModulesGrid() {
   }
   el.innerHTML = modules.map(m => {
     const count = resources.filter(r=>r.modules.includes(m.id)).length;
-    const imgFileId = m.img ? m.img.match(/\/d\/([^/]+)\/preview/) : null;
-    const thumbUrl  = imgFileId ? `https://drive.google.com/thumbnail?id=${imgFileId[1]}&sz=w400` : '';
     const cover = m.img
-      ? `<div style="width:100%;height:110px;overflow:hidden;border-radius:8px;border:1px solid var(--gray-200);flex-shrink:0"><img src="${thumbUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=font-size:32px>📚</span>'"></div>`
+      ? `<div style="width:100%;height:110px;overflow:hidden;border-radius:8px;flex-shrink:0"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=font-size:32px>📚</span>'"></div>`
       : `<div class="module-icon">${m.icon||'📚'}</div>`;
     return `<div class="module-card" onclick="openModulePage('${m.id}');highlightSbItem(document.querySelector('#sbModules .sb-item:nth-child(${modules.indexOf(m)+1})'))">
       <div class="module-card-head">
@@ -947,54 +940,48 @@ async function deleteResource(id) {
 // ── Module image (Drive-based) ──
 let modImgUrl = '';
 
-async function loadDriveImages() {
-  if (!DRIVE_API_KEY) { toast('Enter your API key when signing in as admin.'); return; }
-  const sel = document.getElementById('mImgPick');
-  sel.innerHTML = '<option>— Loading… —</option>';
-  try {
-    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,mimeType,thumbnailLink)&key=${DRIVE_API_KEY}`;
-    const res  = await fetch(url);
-    const data = await res.json();
-    const imgs = (data.files||[]).filter(f => f.mimeType.startsWith('image/'));
-    if (!imgs.length) { sel.innerHTML = '<option value="">— No images in Drive folder yet —</option>'; return; }
-    // store both the embed URL (for saving) and thumbnail (for preview) as data attributes
-    sel.innerHTML = '<option value="">— Select an image —</option>' +
-      imgs.map(f => `<option value="https://drive.google.com/file/d/${f.id}/preview" data-thumb="https://drive.google.com/thumbnail?id=${f.id}&sz=w400" data-name="${f.name}">${f.name}</option>`).join('');
-    if (modImgUrl) { [...sel.options].forEach(o => { if(o.value===modImgUrl) o.selected=true; }); }
-  } catch(e) {
-    sel.innerHTML = '<option value="">— Could not load Drive images —</option>';
-  }
-}
+async function onModImg(inp) {
+  const file = inp.files[0]; if(!file) return;
+  document.getElementById('modImgSpinner').style.display = 'flex';
+  document.getElementById('modImgPlaceholder').style.display = 'none';
 
-function onModImgPick() {
-  const sel   = document.getElementById('mImgPick');
-  const opt   = sel.options[sel.selectedIndex];
-  modImgUrl   = sel.value;
-  const thumb = opt ? opt.dataset.thumb : '';
-  const img   = document.getElementById('modImgThumb');
-  const ph    = document.getElementById('modImgPlaceholder');
-  const clear = document.getElementById('modImgClearWrap');
-  if (modImgUrl && thumb) {
-    img.src = thumb;
-    img.style.display = 'block';
-    ph.style.display  = 'none';
-    clear.style.display = 'block';
-  } else {
-    img.style.display = 'none';
-    ph.style.display  = 'flex';
-    clear.style.display = 'none';
-  }
+  // Compress image to max 300x300 and quality 0.7 to keep base64 small enough for Sheets
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  img.onload = () => {
+    URL.revokeObjectURL(objectUrl);
+    const MAX = 300;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      const ratio = Math.min(MAX/w, MAX/h);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    modImgUrl = canvas.toDataURL('image/jpeg', 0.75);
+    document.getElementById('modImgThumb').src = modImgUrl;
+    document.getElementById('modImgThumb').style.display = 'block';
+    document.getElementById('modImgSpinner').style.display = 'none';
+    document.getElementById('modImgClearWrap').style.display = 'block';
+  };
+  img.src = objectUrl;
 }
 
 function clearModImg() {
   modImgUrl = '';
-  document.getElementById('mImgPick').value = '';
+  document.getElementById('mImgFile').value = '';
   document.getElementById('modImgThumb').style.display = 'none';
+  document.getElementById('modImgThumb').src = '';
   document.getElementById('modImgPlaceholder').style.display = 'flex';
   document.getElementById('modImgClearWrap').style.display = 'none';
+  document.querySelector('.icon-opt').classList.add('on');
+  selIcon = '📚';
 }
 
-function onModImg() {} // kept for compatibility
+function loadDriveImages() {}
+function onModImgPick() {}
 
 function openModuleModal(editId) {
   editModId=editId||null; selIcon='📚'; modImgUrl='';
@@ -1029,7 +1016,7 @@ function openModuleModal(editId) {
     document.getElementById('modModalTitle').textContent='New module';
     document.getElementById('modSaveBtn').textContent='Create module';
   }
-  loadDriveImages();
+  loadDriveImages(); // no-op
   document.getElementById('modOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('mName').focus(),80);
 }
