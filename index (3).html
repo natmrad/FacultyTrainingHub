@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Toolkit — Nathalie Mrad</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--white:#fff;--gray-50:#FAFCFB;--gray-100:#eef6f8;--gray-200:#d4e8f0;--gray-300:#a8ccdc;--gray-400:#78AEC6;--gray-500:#4a7e9a;--gray-700:#2A6D99;--gray-900:#0e2a3d;--blue:#0379C7;--blue-light:#e8f5fc;--blue-border:#B9F0F9;--sw:252px;}
+body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-900);font-size:14px;line-height:1.5;min-height:100vh}
+.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:#0379C7;border-right:1px solid #2A6D99;display:flex;flex-direction:column;z-index:20}
+.sb-brand{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-title{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;color:#fff;letter-spacing:-.2px}
+.sb-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px}
+.sb-section{margin-bottom:18px}
+.sb-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:0 10px;margin-bottom:4px;display:block}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.55);border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;transition:all .12s;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
+.sb-item.on{background:rgba(255,255,255,.12);color:#fff;font-weight:500}
+.sb-item.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:2.5px;background:#B9F0F9;border-radius:2px}
+.sb-item svg{flex-shrink:0;opacity:.5}.sb-item.on svg{opacity:1}
+.sb-mod-count{margin-left:auto;font-size:10px;color:rgba(255,255,255,.35);background:rgba(255,255,255,.08);border-radius:10px;padding:1px 7px}
+.sb-item.on .sb-mod-count{background:rgba(185,240,249,.2);color:#B9F0F9}
+.sb-foot{padding:14px 16px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#2A6D99;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.u-name{font-size:13px;font-weight:500;color:rgba(255,255,255,.85)}
+.u-role{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px}
+.main{margin-left:var(--sw);min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(250,252,251,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 32px;height:56px;display:flex;align-items:center;gap:12px}
+.topbar-title{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;flex:1;color:var(--gray-900)}
+.search{position:relative}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray-500)}
+.search input{background:var(--white);border:1.5px solid var(--gray-300);border-radius:7px;padding:7px 12px 7px 32px;font-size:13px;font-family:'Inter',sans-serif;color:var(--gray-900);outline:none;width:200px;transition:all .2s}
+.search input::placeholder{color:var(--gray-400)}
+.search input:focus{border-color:var(--blue);width:240px}
+.content{flex:1;padding:28px 32px 60px}
+.welcome{display:none}.welcome.active{display:block}
+.welcome-hero{background:#0379C7;border:1px solid #2A6D99;border-radius:12px;padding:40px 44px;margin-bottom:28px;position:relative;overflow:hidden}
+.welcome-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#B9F0F9,#78AEC6)}
+.welcome-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B9F0F9;margin-bottom:10px}
+.welcome-title{font-family:'Source Serif 4',serif;font-size:30px;font-weight:400;color:#fff;letter-spacing:-.5px;margin-bottom:10px;line-height:1.25}
+.welcome-desc{font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:560px}
+.welcome-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
+.w-stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:16px 18px}
+.w-stat-num{font-family:'Source Serif 4',serif;font-size:28px;font-weight:300;color:#fff;letter-spacing:-1px;line-height:1}
+.w-stat-label{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px}
+.modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.module-card{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.06);aspect-ratio:1/1;display:flex;flex-direction:column}
+.module-card:hover{border-color:var(--blue);box-shadow:0 6px 24px rgba(3,121,199,.15);transform:translateY(-3px)}
+.module-card-head{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;flex:1;text-align:center}
+.module-icon{width:54px;height:54px;border-radius:12px;background:#e8f5fc;border:1px solid #B9F0F9;display:flex;align-items:center;justify-content:center;font-size:26px}
+.module-name{font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;color:var(--gray-900);line-height:1.3}
+.module-meta{font-size:11px;color:var(--gray-400);margin-top:2px}
+.module-page{display:none}.module-page.active{display:block}
+.module-page-header{margin-bottom:24px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-400);margin-bottom:10px;cursor:pointer}
+.breadcrumb:hover span:first-child{color:var(--blue)}
+.module-page-title{font-family:'Source Serif 4',serif;font-size:26px;font-weight:400;color:var(--gray-900)}
+.module-page-desc{font-size:13.5px;color:var(--gray-500);margin-top:6px;line-height:1.6;font-weight:300}
+.resources-list{display:flex;flex-direction:column;gap:10px}
+.resource-row{background:var(--white);border:1px solid var(--gray-200);border-radius:9px;display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.resource-row:hover{border-color:var(--blue);box-shadow:0 4px 16px rgba(3,121,199,.1)}
+.res-thumb{width:52px;height:38px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.res-thumb.vid{background:#2A6D99}.res-thumb.doc{background:#78AEC6}
+.res-play{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:10px solid rgba(255,255,255,.75);margin-left:2px}
+.res-doc-lines{display:flex;flex-direction:column;gap:3px;width:22px}
+.res-doc-line{height:2px;background:rgba(255,255,255,.5);border-radius:1px}
+.res-doc-line:nth-child(2){width:80%}.res-doc-line:nth-child(3){width:90%}
+.res-info{flex:1;min-width:0}
+.res-title{font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-desc{font-size:12px;color:var(--gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-tags{display:flex;gap:5px;flex-shrink:0}
+.res-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.res-tag.video{background:#e8f5fc;color:#0379C7;border:1px solid #B9F0F9}
+.res-tag.pdf{background:#eef6f8;color:#2A6D99;border:1px solid #78AEC6}
+.res-dur{font-size:11px;color:var(--gray-500);font-weight:500;flex-shrink:0;min-width:36px;text-align:right}
+.all-page{display:none}.all-page.active{display:block}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.res-card{background:var(--white);border:1.5px solid var(--gray-200);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .18s;animation:up .35s ease both;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.res-card:hover{border-color:var(--blue);box-shadow:0 6px 20px rgba(3,121,199,.12);transform:translateY(-2px)}
+.card-thumb{height:150px;display:flex;align-items:center;justify-content:center;position:relative}
+.card-thumb.vid{background:#2A6D99}.card-thumb.doc{background:#78AEC6}
+.play-btn{width:42px;height:42px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;transition:all .18s;background:rgba(255,255,255,.08)}
+.res-card:hover .play-btn{background:var(--blue);border-color:var(--blue)}
+.play-tri{width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid rgba(255,255,255,.8);margin-left:3px}
+.doc-icon-lg{display:flex;flex-direction:column;gap:4px;width:28px}
+.doc-icon-lg div{height:2.5px;background:rgba(255,255,255,.4);border-radius:1px}
+.doc-icon-lg div:nth-child(2){width:80%}
+.res-card:hover .doc-icon-lg div{background:rgba(255,255,255,.75)}
+.thumb-meta{position:absolute;bottom:9px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center}
+.thumb-type{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.thumb-dur{font-size:10.5px;color:rgba(255,255,255,.7);font-weight:500}
+.card-body{padding:13px 15px 12px}
+.card-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px}
+.tag.ai{background:#e8f5fc;color:#0379C7;border:1px solid #B9F0F9}
+.tag.prompts{background:#eef6f8;color:#2A6D99;border:1px solid #78AEC6}
+.tag.computer{background:#d4e8f0;color:#1a4f6e;border:1px solid #78AEC6}
+.tag.tools,.tag.workflow{background:var(--gray-100);color:var(--gray-700);border:1px solid var(--gray-300)}
+.card-title{font-family:'Source Serif 4',serif;font-size:14px;font-weight:600;color:var(--gray-900);line-height:1.4;margin-bottom:5px}
+.card-desc{font-size:12px;color:var(--gray-500);line-height:1.55;margin-bottom:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--gray-200)}
+.card-date{font-size:11px;color:var(--gray-500);font-weight:500}
+.card-btns{display:flex;gap:4px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-label{font-family:'Source Serif 4',serif;font-size:20px;font-weight:400;color:var(--gray-900)}
+.filters{display:flex;gap:4px;background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:3px}
+.filter-btn{padding:5px 13px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--gray-500);font-family:'Inter',sans-serif;transition:all .12s}
+.filter-btn:hover{background:var(--gray-100);color:var(--gray-900)}
+.filter-btn.on{background:var(--gray-900);color:#fff}
+.viewer-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.viewer-ov.open{opacity:1;pointer-events:all}
+.viewer-bar{width:min(90vw,880px);display:flex;align-items:center;justify-content:space-between}
+.viewer-title{font-family:'Source Serif 4',serif;font-size:16px;font-weight:400;color:rgba(255,255,255,.9)}
+.viewer-close{width:34px;height:34px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.6);font-size:15px;transition:all .12s}
+.viewer-close:hover{background:rgba(255,255,255,.12);color:#fff}
+.viewer-frame{width:min(90vw,880px);height:70vh;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
+.viewer-frame iframe,.viewer-frame video{width:100%;height:100%;border:none}
+.viewer-ph{text-align:center;padding:40px;color:var(--gray-400)}
+.viewer-ph-icon{font-size:40px;margin-bottom:14px;opacity:.3}
+.viewer-ph-title{font-family:'Source Serif 4',serif;font-size:17px;font-weight:300;color:var(--gray-700);margin-bottom:6px}
+.viewer-ph-sub{font-size:13px;line-height:1.6;max-width:280px;margin:0 auto}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gray-900);color:#fff;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:300;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:none;opacity:1}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+.spinner{width:15px;height:15px;border:2px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:3px}
+</style>
+</head>
+<body>
+<aside class="sb">
+  <div class="sb-brand">
+    <div class="sb-title">Digital Toolkit</div>
+    <div class="sb-sub">by Nathalie Mrad</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">
+      <span class="sb-section-label">Navigate</span>
+      <button class="sb-item on" onclick="showPage('welcome',this)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.3"/></svg>
+        Home
+      </button>
+      <button class="sb-item" onclick="showPage('all',this)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+        All resources
+        <span class="sb-mod-count" id="nc-all">0</span>
+      </button>
+    </div>
+    <div class="sb-section">
+      <span class="sb-section-label">Modules</span>
+      <div id="sbModules"></div>
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <div class="avatar">I</div>
+    <div>
+      <div class="u-name">Instructor</div>
+      <div class="u-role">Digital Toolkit</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title" id="topbarTitle">Welcome</div>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" id="searchInput" placeholder="Search resources…" oninput="onSearch()">
+    </div>
+  </header>
+  <div class="content">
+    <div class="welcome active" id="welcomePage">
+      <div class="welcome-hero">
+        <div class="welcome-eyebrow">Digital Toolkit</div>
+        <div class="welcome-title">AI & Tech Tools<br>for Instructors</div>
+        <div class="welcome-desc">A curated library of videos and documents covering AI tools, digital skills, and technology resources to support your teaching practice.</div>
+        <div class="welcome-stats">
+          <div class="w-stat"><div class="w-stat-num" id="ws-modules">0</div><div class="w-stat-label">Training modules</div></div>
+          <div class="w-stat"><div class="w-stat-num" id="ws-videos">0</div><div class="w-stat-label">Video lessons</div></div>
+          <div class="w-stat"><div class="w-stat-num" id="ws-docs">0</div><div class="w-stat-label">Documents & guides</div></div>
+        </div>
+      </div>
+      <div style="font-family:'Source Serif 4',serif;font-size:20px;font-weight:400;color:var(--gray-900);margin-bottom:14px">Training Modules</div>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </div>
+
+    <div class="module-page" id="modulePage">
+      <div class="module-page-header">
+        <div class="breadcrumb" onclick="showPage('welcome')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Home</span><span style="color:var(--gray-200)">›</span>
+          <span id="modulePageBreadcrumb"></span>
+        </div>
+        <div class="module-page-title" id="modulePageTitle"></div>
+        <div class="module-page-desc" id="modulePageDesc"></div>
+      </div>
+      <div class="resources-list" id="moduleResourcesList"></div>
+    </div>
+
+    <div class="all-page" id="allPage">
+      <div class="section-head">
+        <div class="section-label">All resources</div>
+        <div class="filters">
+          <button class="filter-btn on" onclick="setFilter(this,'all')">All</button>
+          <button class="filter-btn" onclick="setFilter(this,'video')">Videos</button>
+          <button class="filter-btn" onclick="setFilter(this,'pdf')">Documents</button>
+        </div>
+      </div>
+      <div class="res-grid" id="allGrid"></div>
+    </div>
+  </div>
+</main>
+
+<div class="viewer-ov" id="viewerOv" onclick="if(event.target.id==='viewerOv')closeViewer()">
+  <div class="viewer-bar">
+    <div class="viewer-title" id="viewerTitle"></div>
+    <button class="viewer-close" onclick="closeViewer()">✕</button>
+  </div>
+  <div class="viewer-frame" id="viewerFrame"></div>
+</div>
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="toastMsg"></span></div>
+
+<script>
+const GAS_URL   = 'https://script.google.com/macros/s/AKfycbwHJiCRnKgGj8UpLhfDNt_ubV-rgw58IoNkrTEAu0o_Gi0ebX_JwMqJbF1Gfj9Ts3Hc/exec';
+const FOLDER_ID = '1FsJLy7Q9iopPxOps1KRSGM3q6YrOasmA';
+const TAG_LABELS= {ai:'AI',prompts:'Prompts',computer:'Computer',tools:'Tools',workflow:'Workflow'};
+let resources=[], modules=[], chipFilter='all', currentPage='welcome', currentModId=null;
+function gasGet(cb){const s=document.createElement('script');const fn='_cb_'+Date.now();window[fn]=d=>{delete window[fn];s.remove();cb(d);};s.src=GAS_URL+'?callback='+fn;document.body.appendChild(s);}
+function gasPost(p){return fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(p).toString()});}
+function genId(){return 'r'+Date.now()+Math.random().toString(36).slice(2,5);}
+function loadAll(){showLoading();gasGet(res=>{if(res&&res.data){resources=(res.resources||res.data||[]).map(r=>{const url=r.url||(r.fileId?`https://drive.google.com/file/d/${r.fileId}/preview`:'');return{...r,url,tags:r.tags?r.tags.split(',').map(t=>t.trim()).filter(Boolean):[],modules:r.modules?r.modules.split(',').map(t=>t.trim()).filter(Boolean):[]};});modules=res.modules||[];}hideLoading();refreshAll();});}
+function showLoading(){const g=document.getElementById('modulesGrid');if(g)g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#78AEC6"><div class="spinner"></div><div style="margin-top:12px;font-size:13px">Loading…</div></div>';}
+function hideLoading(){}
+function refreshAll(){updateStats();renderSidebarModules();renderModulesGrid();renderAllGrid();if(currentPage==='module'&&currentModId)openModulePage(currentModId);}
+function updateStats(){document.getElementById('ws-modules').textContent=modules.length;document.getElementById('ws-videos').textContent=resources.filter(r=>r.type==='video').length;document.getElementById('ws-docs').textContent=resources.filter(r=>r.type==='pdf').length;document.getElementById('nc-all').textContent=resources.length;}
+function showPage(page,btn){['welcome','module','all'].forEach(p=>{const el=document.getElementById(p==='module'?'modulePage':p==='all'?'allPage':'welcomePage');if(el)el.classList.toggle('active',p===page);});currentPage=page;if(btn){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}const titles={welcome:'Welcome',all:'All resources'};document.getElementById('topbarTitle').textContent=titles[page]||'';}
+function openModulePage(modId){const mod=modules.find(m=>m.id===modId);if(!mod)return;currentModId=modId;showPage('module');document.getElementById('topbarTitle').textContent=mod.name;document.getElementById('modulePageTitle').textContent=mod.name;document.getElementById('modulePageBreadcrumb').textContent=mod.name;document.getElementById('modulePageDesc').textContent=mod.desc||'';renderModuleResources(mod);}
+function renderModuleResources(mod){const list=document.getElementById('moduleResourcesList');const modResources=resources.filter(r=>r.modules.includes(mod.id));if(!modResources.length){list.innerHTML=`<div style="text-align:center;padding:48px;color:#78AEC6"><div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:300;color:#4a7e9a;margin-bottom:6px">No resources yet</div></div>`;return;}list.innerHTML=modResources.map(r=>resourceRowHTML(r)).join('');}
+function resourceRowHTML(r){const thumb=r.type==='video'?`<div class="res-thumb vid"><div class="res-play"></div></div>`:`<div class="res-thumb doc"><div class="res-doc-lines"><div class="res-doc-line"></div><div class="res-doc-line"></div><div class="res-doc-line"></div></div></div>`;return `<div class="resource-row" onclick="openViewer('${r.id}')">${thumb}<div class="res-info"><div class="res-title">${r.title}</div><div class="res-desc">${r.desc||''}</div></div><div class="res-tags"><span class="res-tag ${r.type==='video'?'video':'pdf'}">${r.type==='video'?'Video':'PDF'}</span></div>${r.dur?`<div class="res-dur">${r.dur}</div>`:''}</div>`;}
+function renderSidebarModules(){const el=document.getElementById('sbModules');if(!modules.length){el.innerHTML='<div style="padding:4px 10px;font-size:12px;color:rgba(255,255,255,.3)">No modules yet</div>';return;}el.innerHTML=modules.map((m,i)=>{const count=resources.filter(r=>r.modules.includes(m.id)).length;return `<button class="sb-item" onclick="openModulePage('${m.id}');highlightSbItem(this)"><span style="font-size:13px">${m.icon||'📚'}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left">${m.name}</span><span class="sb-mod-count">${count}</span></button>`;}).join('');}
+function highlightSbItem(btn){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function renderModulesGrid(){const el=document.getElementById('modulesGrid');if(!modules.length){el.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:#78AEC6"><div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:300;color:#4a7e9a;margin-bottom:6px">No modules yet</div></div>`;return;}el.innerHTML=modules.map(m=>{const count=resources.filter(r=>r.modules.includes(m.id)).length;const cover=m.img?`<div style="width:100%;height:110px;overflow:hidden;border-radius:8px;flex-shrink:0"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=font-size:32px>${m.icon||'📚'}</span>'"></div>`:`<div class="module-icon">${m.icon||'📚'}</div>`;return `<div class="module-card" onclick="openModulePage('${m.id}');highlightSbItem(document.querySelector('#sbModules .sb-item:nth-child(${modules.indexOf(m)+1})'))"><div class="module-card-head">${cover}<div class="module-name">${m.name}</div><div class="module-meta">${count} resource${count!==1?'s':''}</div></div>${moduleAdminBtns(m)}</div>`;}).join('');}
+function moduleAdminBtns(m){return '';}
+function renderAllGrid(){const q=document.getElementById('searchInput').value.toLowerCase();const vis=resources.filter(r=>{if(chipFilter==='video'&&r.type!=='video')return false;if(chipFilter==='pdf'&&r.type!=='pdf')return false;if(q&&!r.title.toLowerCase().includes(q)&&!(r.desc||'').toLowerCase().includes(q))return false;return true;});const g=document.getElementById('allGrid');if(!vis.length){g.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px;color:#78AEC6"><div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:300;color:#4a7e9a;margin-bottom:6px">No resources found</div></div>`;return;}g.innerHTML=vis.map(r=>resourceCardHTML(r)).join('');}
+function resourceCardHTML(r){const d=new Date(r.date);const ds=isNaN(d)?r.date:d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});const tagHTML=r.tags.slice(0,2).map(t=>`<span class="tag ${t}">${TAG_LABELS[t]||t}</span>`).join('');const thumb=r.type==='video'?`<div class="card-thumb vid"><div class="play-btn"><div class="play-tri"></div></div><div class="thumb-meta"><span class="thumb-type">Video</span>${r.dur?`<span class="thumb-dur">${r.dur}</span>`:''}</div></div>`:`<div class="card-thumb doc"><div class="doc-icon-lg"><div></div><div></div><div></div></div><div class="thumb-meta"><span class="thumb-type">Document</span></div></div>`;return `<div class="res-card" onclick="openViewer('${r.id}')">${thumb}<div class="card-body"><div class="card-tags">${tagHTML}</div><div class="card-title">${r.title}</div><div class="card-desc">${r.desc||''}</div><div class="card-foot"><span class="card-date">${ds}</span><div class="card-btns">${cardAdminBtns(r)}</div></div></div></div>`;}
+function cardAdminBtns(r){return '';}
+function setFilter(btn,f){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');chipFilter=f;renderAllGrid();}
+function onSearch(){if(currentPage==='all')renderAllGrid();}
+function openViewer(id){const r=resources.find(x=>x.id===id);if(!r)return;document.getElementById('viewerTitle').textContent=r.title;const f=document.getElementById('viewerFrame');if(r.url&&r.url.includes('youtube.com/embed')){f.innerHTML=`<iframe src="${r.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;}else if(r.url&&r.url.includes('drive.google.com')){f.innerHTML=`<iframe src="${r.url}" allow="autoplay" allowfullscreen></iframe>`;}else if(r.type==='video'&&r.url){f.innerHTML=`<video src="${r.url}" controls style="width:100%;height:100%;background:#000"></video>`;}else{f.innerHTML=`<div class="viewer-ph"><div class="viewer-ph-icon">${r.type==='pdf'?'📄':'🎬'}</div><div class="viewer-ph-title">${r.title}</div><div class="viewer-ph-sub">No file attached yet.</div></div>`;}document.getElementById('viewerOv').classList.add('open');}
+function closeViewer(){document.getElementById('viewerOv').classList.remove('open');setTimeout(()=>{document.getElementById('viewerFrame').innerHTML='';},250);}
+function toast(msg){const el=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();});
+loadAll();
+</script>
+</body>
+</html>
